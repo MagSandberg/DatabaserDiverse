@@ -16,9 +16,9 @@ USE KlassenDb;
 --INSERT INTO PersonTbl ([Id], [Förnamn], [Efternamn], [Ålder], [Hemort])
 --VALUES (5, 'Erik', 'Sturén', 31, 'Göteborg');
 
-UPDATE PersonTbl
-SET Hemort = 'Göteborg'
-WHERE Hemort = 'Götebord';
+--UPDATE PersonTbl
+--SET Hemort = 'Göteborg'
+--WHERE Hemort = 'Götebord';
 
 SELECT * FROM PersonTbl;
 
