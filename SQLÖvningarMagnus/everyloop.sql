@@ -1,6 +1,15 @@
 --USE everyloop;
 
---select * into Elements2 from Elements;
+--select * into Elements3 from Elements;
+
+
+------------------------------------------
+
+
+--1: Ta ut data (select) från tabellen GameOfThrones på sådant sätt 
+--att ni får ut en kolumn ’Title’ med titeln samt en kolumn ’Episode’ 
+--som visar episoder och säsonger i formatet ”S01E01”, ”S01E02”, 
+--osv. Tips: kolla upp funktionen format()
 
 --select Episode, Title from GameOfThrones;
 
@@ -8,14 +17,34 @@
 
 --SELECT CONCAT('S0', Season, 'E0', EpisodeInSeason) as SeasonEpisode FROM GameOfThrones;
 
---SELECT Title, CONCAT(FORMAT(Season, 'S0#') ,FORMAT(EpisodeInSeason, 'E0#')) AS Episode
+--SELECT Title,
+--CASE
+--    WHEN EpisodeInSeason < 10 THEN CONCAT(FORMAT(Season, 'S0#') ,FORMAT(EpisodeInSeason, 'E0#'))
+--    WHEN EpisodeInSeason >= 10 THEN CONCAT(FORMAT(Season, 'S0#') ,FORMAT(EpisodeInSeason, 'E#'))
+--END AS Episode
 --FROM GameOfThrones;
+
+
+------------------------------------------
+
+
+--2: Uppdatera (kopia på) tabellen user och sätt username för alla användare 
+--så den blir de 2 första bokstäverna i förnamnet, och de 2 första i 
+--efternamnet (istället för 3+3 som det är i orginalet). 
+--Hela användarnamnet ska vara i små bokstäver.
 
 --SELECT LOWER(CONCAT(SUBSTRING(FirstName, 1, 2), SUBSTRING(LastName, 1, 2))) AS UserName
 --FROM Users2;
 
 --UPDATE Users2 
 --SET UserName = LOWER(CONCAT(SUBSTRING(FirstName, 1, 2), SUBSTRING(LastName, 1, 2)));
+
+
+------------------------------------------
+
+
+--3: Uppdatera (kopia på) tabellen airports så att alla null-värden i 
+--kolumnerna Time och DST byts ut mot ’-’
 
 --UPDATE Airports2
 --SET [Time] = '-'
@@ -27,8 +56,107 @@
 
 --SELECT * FROM Airports2;
 
+
+------------------------------------------
+
+
+--4: Ta bort de rader från (kopia på) tabellen Elements där ”Name” är någon 
+--av följande: 'Erbium', 'Helium', 'Nitrogen', 'Platinum', 'Selenium', 
+--samt alla rader där ”Name” börjar på någon av bokstäverna 
+--d, k, m, o, eller u.
+
 --DELETE FROM Elements2
 -- WHERE [Name] IN ('Erbium', 'Helium', 'Nitrogen', 'Platinum', 'Selenium') or
 -- [Name] LIKE 'd%' or [name] like 'k%' or [name] like 'm%' or [name] like 'o%' or [name] like'u%';
 
 --SELECT * FROM Elements2;
+
+
+------------------------------------------
+
+
+--5: Skapa en ny tabell med alla rader från tabellen Elements. 
+--Den nya tabellen ska innehålla ”Symbol” och ”Name” från orginalet, 
+--samt en tredje kolumn med värdet ’Yes’ för de rader där ”Name” börjar 
+--med bokstäverna i ”Symbol”, och ’No’ för de rader där de inte gör det.
+
+--Ex: ’He’ -> ’Helium’ -> ’Yes’, ’Mg’ -> ’Magnesium’ -> ’No’.
+
+--SELECT Symbol, [Name], 
+--    CASE 
+--        WHEN SUBSTRING([Name], 1, 2) = Symbol AND LEN(Symbol) > 1 THEN 'Yes'
+--        WHEN SUBSTRING([Name], 1, 1) = Symbol AND LEN(Symbol) < 2 THEN 'Yes'
+--        ELSE 'No'
+--END AS Yesno 
+--INTO Elements4
+--FROM Elements;
+
+--SELECT * FROM Elements4;
+
+
+------------------------------------------
+
+
+--6: Kopiera tabellen Colors till Colors2, men skippa kolumnen ”Code”. 
+--Gör sedan en select från Colors2 som ger samma resultat som du skulle fått 
+--från select * from Colors; (Dvs, återskapa den saknade kolumnen från 
+--RGBvärdena i resultatet).
+
+--SELECT * INTO Colors2 FROM Colors;
+
+--ALTER TABLE Colors2
+--DROP COLUMN Code;
+
+--SELECT 
+--CONVERT(VARBINARY(1), Red), 
+--CONVERT(VARBINARY(1), Green), 
+--CONVERT(VARBINARY(1), Blue) FROM Colors2;
+
+--SELECT CONVERT(VARBINARY(8), Red, Green, Blue) FROM Colors2; 
+
+--SELECT
+--	CONVERT(Varbinary(1), Red)+ 
+--	CONVERT(Varbinary(1), Green)+ 
+--	CONVERT(Varbinary(1), Blue) AS Code
+--FROM Colors2;
+
+--SELECT
+--	CASE 
+--		WHEN 
+--			FORMAT(Red, 'X') = '0' THEN '00' +
+--			FORMAT(Green, 'X') = '0' THEN '00' +
+--			FORMAT(Blue, 'X') = '0' THEN '00'
+--		ELSE 
+--			FORMAT(Red, 'X')+
+--			FORMAT(Green, 'X')+
+--			FORMAT(Blue, 'X')
+--	END AS Code
+--FROM Colors2;
+
+--SELECT [Name], CONVERT(Varbinary(1), Red)+ CONVERT(Varbinary(1), Green) + CONVERT(Varbinary(1), Blue) as code, Red, Green, Blue
+--INTO Colors6 
+--FROM Colors;
+
+--SELECT [Name], CONCAT('#', CONVERT(VARCHAR(max), code, 2)) AS newCode, Red, Green, Blue FROM Colors6;
+
+--SELECT * FROM Colors;
+
+
+------------------------------------------
+
+
+--7: Kopiera kolumnerna ”Integer” och ”String” från tabellen ”Types” till en ny tabell. 
+--Gör sedan en select från den nya tabellen som ger samma resultat som du skulle 
+--fått från select * from types;
+
+SELECT [Integer], [String] INTO Types2 FROM Types;
+
+SELECT [Integer], [Integer]*0.01 AS [Float], 
+[String],
+CASE 
+    WHEN [Integer]%2 = 0 THEN 0
+    ELSE 1
+END AS [Bool] FROM Types2
+
+--SELECT * FROM Types2;
+--SELECT * FROM Types;
