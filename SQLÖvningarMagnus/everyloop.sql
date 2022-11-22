@@ -143,20 +143,65 @@
 
 
 ------------------------------------------
-
+--use everyloop;
 
 --7: Kopiera kolumnerna ”Integer” och ”String” från tabellen ”Types” till en ny tabell. 
 --Gör sedan en select från den nya tabellen som ger samma resultat som du skulle 
 --fått från select * from types;
 
-SELECT [Integer], [String] INTO Types2 FROM Types;
+--SELECT [Integer], [String] INTO Types2 FROM Types;
 
-SELECT [Integer], [Integer]*0.01 AS [Float], 
-[String],
-CASE 
-    WHEN [Integer]%2 = 0 THEN 0
-    ELSE 1
-END AS [Bool] FROM Types2
+--DECLARE @time time(7) = '09:01:00.0000000';
+--DECLARE @increment int = 0;
 
---SELECT * FROM Types2;
+--SELECT [Integer], [Integer]*0.01 AS [Float], 
+--[String], DATEADD(MI, @increment + 1, @time) AS [DateTime],
+--CASE 
+--    WHEN [Integer]%2 = 0 THEN 0
+--    ELSE 1
+--END AS [Bool] FROM Types2;
+
+----SELECT * FROM Types2;
 --SELECT * FROM Types;
+
+--ÖVNINGAR 2
+
+--1: Företagets totala produktkatalog består av 77 unika produkter. 
+--Om vi kollar bland våra ordrar, hur stor andel av dessa produkter har vi någon gång leverarat till London?
+
+--SELECT * FROM company.orders ORDER BY ShipCity ASC;
+--SELECT * FROM company.order_details;
+
+--SELECT CONVERT(float, COUNT(DISTINCT ProductId)) / CONVERT(float, 77) * 100 as Antal
+--FROM
+--		company.orders 
+--JOIN	company.order_details ON company.orders.Id = OrderId
+--JOIN	company.products ON ProductId = company.products.Id
+--WHERE ShipCity = 'London';
+
+--2: Till vilken stad har vi levererat flest unika produkter?
+
+--SELECT COUNT(DISTINCT OrderId) as OrderIdCount, ShipCity
+--FROM
+--		company.orders 
+--JOIN	company.order_details ON company.orders.Id = OrderId
+--JOIN	company.products ON ProductId = company.products.Id
+--GROUP BY ShipCity;
+
+--3: Av de produkter som inte längre finns I vårat sortiment, hur mycket har vi sålt för totalt till Tyskland?
+
+SELECT ProductId, ProductName, COUNT(ProductId) * company.products.UnitPrice as QtyTimesPrice, company.order_details.Discount,
+CASE
+	WHEN company.order_details.Discount > 0
+	THEN COUNT(ProductId) * company.products.UnitPrice - COUNT(ProductId) * company.products.UnitPrice * company.order_details.Discount
+	ELSE COUNT(ProductId) * company.products.UnitPrice
+	END AS OrderTotal 
+FROM
+		company.orders 
+JOIN	company.order_details ON company.orders.ShipCountry LIKE 'Germany'
+JOIN	company.products ON ProductId = company.products.Id
+WHERE	ReorderLevel = 0
+GROUP BY ProductId, ProductName, company.products.UnitPrice, company.order_details.Discount
+ORDER BY ProductName ASC;
+
+SELECT * FROM company.order_details;
