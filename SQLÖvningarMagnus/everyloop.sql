@@ -221,7 +221,42 @@
 --SELECT top 1 CompanyName,  SUM(Quantity) AS SumProducts FROM company.orders 
 --JOIN company.order_details ON company.orders.Id = OrderId
 --JOIN company.products ON company.order_details.ProductId = company.products.Id
---join company.suppliers ON company.products.SupplierId = company.suppliers.Id
+--JOIN company.suppliers ON company.products.SupplierId = company.suppliers.Id
 --WHERE OrderDate >= '2013-06-01' AND OrderDate < '2013-09-01'
 --GROUP BY CompanyName
 --ORDER BY SumProducts DESC;
+
+--Med tabellerna från schema “music”, svara på följande frågor:
+
+--1: Av alla audiospår, vilken artist har längst total speltid?
+--2: Vad är den genomsnittliga speltiden på den artistens låtar?
+--3: Vad är den sammanlagda filstorleken för all video?
+--4: Vilket är det högsta antal artister som finns på en enskild spellista?
+--5. Vilket är det genomsnittliga antalet artister per spellista?
+
+DECLARE @playlist VARCHAR(max) = 'Heavy Metal Classic';
+
+SELECT @playlist FROM music.playlists;
+SELECT * FROM music.playlists;
+SELECT * FROM music.playlist_track;
+SELECT * FROM music.tracks;
+SELECT * FROM music.albums;
+SELECT * FROM music.artists;
+--Genre	Artist	Album	Track	Length	Size	Composer
+
+--SELECT * INTO music.tracks2 FROM music.tracks;
+
+--UPDATE music.tracks
+--SET Composer = '-'
+--WHERE Composer IS NULL; 
+
+SELECT genres.Name AS Genre, artists.Name AS Artist, albums.Title AS Album, tracks.Name AS Track, 
+RIGHT(CONVERT(CHAR(8),DATEADD(second, (Milliseconds / (1000)), 0),108),5) AS Length,
+CONCAT(ROUND(CONVERT(float, Bytes / CONVERT(float, 1048576)), 1), ' MiB') AS Size, Composer
+FROM music.tracks
+JOIN music.albums ON music.tracks.AlbumId = music.albums.AlbumId
+JOIN music.artists ON music.albums.Artistid = music.artists.ArtistId
+JOIN music.genres ON music.tracks.GenreId = music.genres.GenreId
+JOIN music.playlist_track ON music.tracks.TrackId = music.playlist_track.TrackId
+WHERE PlaylistId = 17;
+
