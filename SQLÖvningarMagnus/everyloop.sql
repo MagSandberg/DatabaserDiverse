@@ -161,7 +161,7 @@
 --    ELSE 1
 --END AS [Bool] FROM Types2;
 
-----SELECT * FROM Types2;
+--SELECT * FROM Types2;
 --SELECT * FROM Types;
 
 --ÖVNINGAR 2
@@ -179,9 +179,10 @@
 --JOIN	company.products ON ProductId = company.products.Id
 --WHERE ShipCity = 'London';
 
+
 --2: Till vilken stad har vi levererat flest unika produkter?
 
---SELECT COUNT(DISTINCT OrderId) as OrderIdCount, ShipCity
+--SELECT COUNT(DISTINCT ProductId) as OrderIdCount, ShipCity
 --FROM
 --		company.orders 
 --JOIN	company.order_details ON company.orders.Id = OrderId
@@ -190,18 +191,37 @@
 
 --3: Av de produkter som inte längre finns I vårat sortiment, hur mycket har vi sålt för totalt till Tyskland?
 
-SELECT ProductId, ProductName, COUNT(ProductId) * company.products.UnitPrice as QtyTimesPrice, company.order_details.Discount,
-CASE
-	WHEN company.order_details.Discount > 0
-	THEN COUNT(ProductId) * company.products.UnitPrice - COUNT(ProductId) * company.products.UnitPrice * company.order_details.Discount
-	ELSE COUNT(ProductId) * company.products.UnitPrice
-	END AS OrderTotal 
-FROM
-		company.orders 
-JOIN	company.order_details ON company.orders.ShipCountry LIKE 'Germany'
-JOIN	company.products ON ProductId = company.products.Id
-WHERE	ReorderLevel = 0
-GROUP BY ProductId, ProductName, company.products.UnitPrice, company.order_details.Discount
-ORDER BY ProductName ASC;
+--SELECT	OrderId, ShipName, ShipCountry, ProductId, order_details.Quantity, order_details.UnitPrice,
+--		ProductName, Quantity * order_details.UnitPrice as QtyTimesPrice, 
+--		company.order_details.Discount,
+--CASE
+--	WHEN company.order_details.Discount > 0
+--	THEN Quantity * company.products.UnitPrice - Quantity * company.products.UnitPrice * company.order_details.Discount
+--	ELSE Quantity * company.products.UnitPrice
+--END AS 
+--	OrderTotal
+--FROM	
+--	company.orders 
+--JOIN	company.order_details ON company.orders.Id = OrderId
+--JOIN	company.products ON ProductId = company.products.Id
+--WHERE	Discontinued = 1 AND ShipCountry LIKE 'Germany'
+--GROUP BY OrderId, ShipName, Quantity, order_details.UnitPrice, ProductId, ProductName, company.products.UnitPrice, company.order_details.Discount, ShipCountry
+--ORDER BY ProductId ASC;
 
-SELECT * FROM company.order_details;
+--4: För vilken produktkategori har vi högst lagervärde
+
+--SELECT categories.Id, categories.CategoryName, SUM(UnitsInStock) AS TotalUnits 
+--FROM company.products
+--JOIN company.categories ON company.products.CategoryId = company.categories.Id
+--GROUP BY categories.Id, categories.CategoryName
+--ORDER BY TotalUnits DESC;
+
+--5: Från vilken leverantör har vi sålt flest produkter totalt under sommaren 2013?
+
+--SELECT top 1 CompanyName,  SUM(Quantity) AS SumProducts FROM company.orders 
+--JOIN company.order_details ON company.orders.Id = OrderId
+--JOIN company.products ON company.order_details.ProductId = company.products.Id
+--join company.suppliers ON company.products.SupplierId = company.suppliers.Id
+--WHERE OrderDate >= '2013-06-01' AND OrderDate < '2013-09-01'
+--GROUP BY CompanyName
+--ORDER BY SumProducts DESC;
