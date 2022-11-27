@@ -376,13 +376,30 @@
 --    ELSE 'Man'
 --END AS Kön
 --FROM Users
+--ORDER BY FirstName, LastName
 
 --5: Ta ut en lista över regioner i tabellen ”Countries” där det för varje region framgår 
 --regionens namn, antal länder i regionen, totalt antal invånare, total area, befolkningstätheten 
 --med 2 decimaler, samt spädbarnsdödligheten per 100.000 födslar avrundat till heltal.
 
-
+--SELECT 
+--Region, 
+--COUNT(Country) AS Countries, 
+--SUM(CONVERT (bigint, [Population])) AS population,
+--SUM([Area (sq# mi#)]) AS TotalArea,
+--ROUND(AVG(CONVERT(float, REPLACE([Pop# Density (per sq# mi#)], ',', ''))) / 10, 2) AS Density,
+--ROUND(AVG(CONVERT(float, REPLACE([Infant mortality (per 1000 births)], ',', ''))), 0) AS InfantMortality
+--FROM Countries
+--GROUP BY Region;
 
 --6: Från tabellen ”Airports”, gruppera per land och ta ut kolumner som visar: land, 
 --antal flygplatser (IATA-koder), antal som saknar ICAO-kod, samt hur många procent av 
 --flygplatserna i varje land som saknar ICAO-kod.
+
+
+--SELECT
+--SUBSTRING([Location served] , LEN([Location served]) - CHARINDEX(',', REVERSE([Location served])) + 3, LEN([Location served])) AS Country
+--FROM Airports
+--GROUP BY SUBSTRING([Location served] , LEN([Location served]) - CHARINDEX(',', REVERSE([Location served])) + 3, LEN([Location served]))
+
+--SELECT * FROM Airports
